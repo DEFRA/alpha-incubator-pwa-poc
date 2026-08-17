@@ -42,6 +42,6 @@ notification service.
   `managing-vapid-keys-via-environment-variables.adr.md`) and for handling push service
   errors (e.g. expired subscriptions returning HTTP 410) ourselves, rather than relying on
   a vendor SDK's built-in retry/delivery-tracking tooling.
-- **Neutral:** This decision only concerns notification *delivery*; it does not preclude
+- **Neutral:** This decision only concerns notification _delivery_; it does not preclude
   adopting a vendor SDK later if the POC evolves into a production service with different
   needs (e.g. android/native app notification fan-out).

@@ -19,8 +19,8 @@ Options considered:
 - **Hapi `yar` session storage** — per-browser-session, already used elsewhere in this
   template for session state.
 
-This is an explicit proof-of-concept scoped to demonstrating the *installation → register
-→ notify → click-through* flow, single-tester, single-instance, short-lived by nature
+This is an explicit proof-of-concept scoped to demonstrating the _installation → register
+→ notify → click-through_ flow, single-tester, single-instance, short-lived by nature
 (the whole POC's lifecycle is measured in a demo session, not days). Redis/session-backed
 storage would add durability and multi-instance support that this POC does not need, at
 the cost of extra wiring for a decision that is trivial to revisit later.

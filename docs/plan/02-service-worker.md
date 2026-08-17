@@ -18,6 +18,7 @@ and that routes a tap on that notification to `/notification-page`.
 
 1. **Create `src/client/sw.js`** (or serve it from a location that resolves to `/sw.js` in
    production) implementing:
+
    ```js
    self.addEventListener('push', (event) => {
      const data = event.data ? event.data.json() : {}
@@ -41,6 +42,7 @@ and that routes a tap on that notification to `/notification-page`.
      )
    })
    ```
+
 2. **Ensure `/sw.js` is served from the root** with `Content-Type: application/javascript`
    — extend `serve-static-files.js` (or add a dedicated route) rather than relying on the
    generic `{param*}` asset path if that would place it under a subpath.

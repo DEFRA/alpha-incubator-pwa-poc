@@ -6,10 +6,10 @@ Prove, with the minimum amount of code, that this Hapi.js + GOV.UK Frontend serv
 
 1. Be installed as a PWA from Safari (macOS locally, iOS/iPadOS once deployed to `dev`).
 2. Let a user click **"Register for notifications"**.
-3. Send that user a native push notification (*"test notification"*) ~30 seconds later.
+3. Send that user a native push notification (_"test notification"_) ~30 seconds later.
 4. Open a **`/notification-page`** when that notification is tapped.
 
-This is a proof of concept for the *steps involved*, not a production feature. See
+This is a proof of concept for the _steps involved_, not a production feature. See
 `AGENTS.md` for the guardrails that keep it minimal, and `adr/` for the rationale behind
 the key technical choices.
 
@@ -43,15 +43,15 @@ rather than any vendor-specific push SDK — see
 
 ## Stage sequence
 
-| Stage | File | Summary |
-|---|---|---|
-| 01 | `01-installability.md` | Web App Manifest, icons, meta tags so the site is installable from Safari |
-| 02 | `02-service-worker.md` | Root-scoped service worker: registration, `push` handler, `notificationclick` handler |
-| 03 | `03-subscription-flow.md` | "Register for notifications" button, permission + subscribe, POST subscription to server |
-| 04 | `04-sending-notifications.md` | `web-push` dependency, VAPID config, 30s scheduled send of the test notification |
-| 05 | `05-notification-page.md` | New `/notification-page` route (heading + lorem ipsum) as the click target |
-| 06 | `06-testing-and-docs.md` | Unit tests for new code, manual test scripts (macOS + iOS), README/AGENTS.md updates |
-| 07 | `07-stretch-geolocation.md` *(optional)* | Gate the notification send on the user's geolocation being within a configurable area |
+| Stage | File                                     | Summary                                                                                  |
+| ----- | ---------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 01    | `01-installability.md`                   | Web App Manifest, icons, meta tags so the site is installable from Safari                |
+| 02    | `02-service-worker.md`                   | Root-scoped service worker: registration, `push` handler, `notificationclick` handler    |
+| 03    | `03-subscription-flow.md`                | "Register for notifications" button, permission + subscribe, POST subscription to server |
+| 04    | `04-sending-notifications.md`            | `web-push` dependency, VAPID config, 30s scheduled send of the test notification         |
+| 05    | `05-notification-page.md`                | New `/notification-page` route (heading + lorem ipsum) as the click target               |
+| 06    | `06-testing-and-docs.md`                 | Unit tests for new code, manual test scripts (macOS + iOS), README/AGENTS.md updates     |
+| 07    | `07-stretch-geolocation.md` _(optional)_ | Gate the notification send on the user's geolocation being within a configurable area    |
 
 Stages should be implemented in order 01→06; stage 07 is an optional stretch goal that
 can be picked up independently once the core flow (01–06) works end to end.

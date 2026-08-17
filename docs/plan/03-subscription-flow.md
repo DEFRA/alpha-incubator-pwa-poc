@@ -14,29 +14,33 @@ creates a Push subscription, and sends it to the server for storage.
    ```
 2. **Client-side handler** in `src/client/javascripts/application.js` (or a new module
    imported from there):
+
    ```js
-   document.getElementById('register-notifications')?.addEventListener('click', async () => {
-     const permission = await Notification.requestPermission()
-     if (permission !== 'granted') return
+   document
+     .getElementById('register-notifications')
+     ?.addEventListener('click', async () => {
+       const permission = await Notification.requestPermission()
+       if (permission !== 'granted') return
 
-     const registration = await navigator.serviceWorker.ready
-     const subscription = await registration.pushManager.subscribe({
-       userVisibleOnly: true,
-       applicationServerKey: VAPID_PUBLIC_KEY // injected server-side, see below
-     })
+       const registration = await navigator.serviceWorker.ready
+       const subscription = await registration.pushManager.subscribe({
+         userVisibleOnly: true,
+         applicationServerKey: VAPID_PUBLIC_KEY // injected server-side, see below
+       })
 
-     await fetch('/api/push/subscribe', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify(subscription)
+       await fetch('/api/push/subscribe', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(subscription)
+       })
      })
-   })
    ```
    - `VAPID_PUBLIC_KEY` needs to reach the client — simplest approach: render it into the
      page via nunjucks (e.g. a `data-` attribute on the button, or a small inline script
      tag) from server-side config, rather than hard-coding it in the bundled JS.
    - **Must be triggered by direct user interaction** (the click handler itself) per
      WebKit's requirement — don't call `requestPermission()`/`subscribe()` on page load.
+
 3. **Add a new route** `src/server/routes/push/index.js` +
    `src/server/routes/push/controller.js` handling `POST /api/push/subscribe`:
    - Validate the request body (a `PushSubscription` JSON object: `endpoint`, `keys.p256dh`,

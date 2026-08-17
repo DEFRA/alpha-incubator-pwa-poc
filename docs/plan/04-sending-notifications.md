@@ -25,6 +25,7 @@ and wire it to fire ~30 seconds after a successful registration.
    vapidSubject: { doc: 'VAPID subject (mailto: or URL)', format: String, default: 'mailto:example@defra.gov.uk', env: 'VAPID_SUBJECT' }
    ```
 4. **Create a push-sending service**, e.g. `src/server/common/helpers/push/push-service.js`:
+
    ```js
    import webPush from 'web-push'
    import { config } from '#/config/config.js'
@@ -44,10 +45,13 @@ and wire it to fire ~30 seconds after a successful registration.
      return webPush.sendNotification(subscription, payload)
    }
    ```
+
 5. **Schedule the send** from the `/api/push/subscribe` handler added in Stage 03:
    ```js
    setTimeout(() => {
-     sendTestNotification(storedSubscription).catch((err) => request.logger.error(err))
+     sendTestNotification(storedSubscription).catch((err) =>
+       request.logger.error(err)
+     )
    }, 30_000)
    ```
    - Keep this simple (`setTimeout`) — no job queue/scheduler needed for a POC.

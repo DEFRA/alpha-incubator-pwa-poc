@@ -14,13 +14,14 @@ The target end-to-end flow being prototyped:
 1. A user visits the site in Safari and installs it to their Home Screen (macOS Dock /
    iOS Home Screen) as a PWA.
 2. On a page, the user clicks a **"Register for notifications"** button.
-3. ~30 seconds later, the device shows a native push notification: *"test notification"*.
+3. ~30 seconds later, the device shows a native push notification: _"test notification"_.
 4. Tapping the notification opens the installed app to a **`/notification-page`** showing
    a simple confirmation page.
 
 Because this is a POC:
+
 - Keep implementations minimal and readable over robust/production-hardened. Favour
-  clarity for demoing the *steps involved*, not completeness.
+  clarity for demoing the _steps involved_, not completeness.
 - Don't add offline support, caching strategies (Workbox, etc.), multi-user auth, or
   horizontal-scaling concerns unless a task explicitly asks for it — see `adr/` for the
   scope decisions already made and why.
@@ -32,7 +33,7 @@ Because this is a POC:
 - **`docs/plan/`** — the staged build plan for this POC. Read `docs/plan/00-overview.md`
   first, then the stage relevant to your task. Each stage file lists its goal, concrete
   steps/files touched, and manual verification steps.
-- **`adr/`** — Architecture Decision Records explaining *why* key choices were made
+- **`adr/`** — Architecture Decision Records explaining _why_ key choices were made
   (e.g. why standard Web Push instead of a vendor SDK, why in-memory storage). Check
   here before revisiting or contradicting a prior decision; if you must contradict one,
   follow the ADR convention below (new ADR + mark the old one `Superseded`).

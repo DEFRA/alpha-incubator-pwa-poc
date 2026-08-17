@@ -30,6 +30,7 @@ formatting) and document how to demo/test the flow end to end.
 ### Manual test script
 
 **Local (macOS Safari, `localhost`):**
+
 1. `docker compose up` (or `npm run dev`).
 2. Open `http://localhost:3000` in Safari.
 3. Add to Dock (installability check from Stage 01).
@@ -38,6 +39,7 @@ formatting) and document how to demo/test the flow end to end.
 6. Click it — confirm `/notification-page` opens showing "Notification page" + lorem ipsum.
 
 **Device (iPhone/iPad Safari, after deploying to CDP `dev`):**
+
 1. Deploy the branch/PR to the `dev` environment.
 2. Open the `dev` URL in Safari on the device.
 3. Share → "Add to Home Screen".

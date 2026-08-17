@@ -214,6 +214,12 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  vapidPublicKey: {
+    doc: 'VAPID public key for web push, shared with the browser to create a push subscription',
+    format: String,
+    default: '',
+    env: 'VAPID_PUBLIC_KEY'
   }
 })
 

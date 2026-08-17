@@ -45,4 +45,15 @@ describe('#homeController', () => {
       expect.stringContaining('<meta name="theme-color" content="#1d70b8">')
     )
   })
+
+  test('Should render a "Register for notifications" button', async () => {
+    const { result } = await getHome()
+
+    expect(result).toEqual(
+      expect.stringContaining('id="register-notifications"')
+    )
+    expect(result).toEqual(
+      expect.stringContaining('Register for notifications')
+    )
+  })
 })

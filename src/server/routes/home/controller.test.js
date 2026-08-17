@@ -42,9 +42,7 @@ describe('#homeController', () => {
       expect.stringContaining('<meta name="apple-mobile-web-app-title"')
     )
     expect(result).toEqual(
-      expect.stringContaining(
-        '<meta name="theme-color" content="#1d70b8">'
-      )
+      expect.stringContaining('<meta name="theme-color" content="#1d70b8">')
     )
   })
 })

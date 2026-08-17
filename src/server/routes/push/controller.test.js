@@ -1,6 +1,14 @@
+import { vi } from 'vitest'
+
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { getSubscription } from '#/server/common/helpers/push/subscription-store.js'
+
+const sendTestNotification = vi.fn(() => Promise.resolve())
+
+vi.mock('#/server/common/helpers/push/push-service.js', () => ({
+  sendTestNotification: (...args) => sendTestNotification(...args)
+}))
 
 describe('#pushSubscribeController', () => {
   let server
@@ -27,6 +35,15 @@ describe('#pushSubscribeController', () => {
 
   afterAll(async () => {
     await server.stop({ timeout: 0 })
+  })
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    sendTestNotification.mockClear()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   test('Should respond with 400 when endpoint is missing', async () => {
@@ -60,5 +77,25 @@ describe('#pushSubscribeController', () => {
 
     expect(statusCode).toBe(statusCodes.accepted)
     expect(getSubscription()).toEqual(validSubscription)
+  })
+
+  test('Should schedule sendTestNotification with the subscription ~30 seconds after a valid subscribe', async () => {
+    await postSubscribe(validSubscription)
+
+    expect(sendTestNotification).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(30_000)
+
+    expect(sendTestNotification).toHaveBeenCalledWith(validSubscription)
+  })
+
+  test('Should log an error and not crash the server when the scheduled send fails', async () => {
+    sendTestNotification.mockRejectedValueOnce(new Error('Gone'))
+
+    const { request } = await postSubscribe(validSubscription)
+    const errorSpy = vi.spyOn(request.logger, 'error')
+
+    await expect(vi.advanceTimersByTimeAsync(30_000)).resolves.not.toThrow()
+    expect(errorSpy).toHaveBeenCalledWith(expect.any(Error))
   })
 })

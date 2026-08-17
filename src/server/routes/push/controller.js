@@ -1,5 +1,8 @@
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { saveSubscription } from '#/server/common/helpers/push/subscription-store.js'
+import { sendTestNotification } from '#/server/common/helpers/push/push-service.js'
+
+const notificationDelayMs = 30_000
 
 /**
  * Validates the shape of an incoming PushSubscription payload
@@ -27,6 +30,12 @@ export const pushSubscribeController = {
     }
 
     saveSubscription(subscription)
+
+    setTimeout(() => {
+      sendTestNotification(subscription).catch((err) =>
+        request.logger.error(err)
+      )
+    }, notificationDelayMs)
 
     return h.response().code(statusCodes.accepted)
   }

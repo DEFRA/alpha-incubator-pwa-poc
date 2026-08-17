@@ -220,6 +220,19 @@ export const config = convict({
     format: String,
     default: '',
     env: 'VAPID_PUBLIC_KEY'
+  },
+  vapidPrivateKey: {
+    doc: 'VAPID private key for web push, used to sign outgoing push messages. Never exposed to the client.',
+    format: String,
+    default: '',
+    env: 'VAPID_PRIVATE_KEY',
+    sensitive: true
+  },
+  vapidSubject: {
+    doc: 'VAPID subject (a mailto: address or URL) identifying the sender of push messages',
+    format: String,
+    default: 'mailto:example@defra.gov.uk',
+    env: 'VAPID_SUBJECT'
   }
 })
 

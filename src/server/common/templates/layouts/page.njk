@@ -14,7 +14,10 @@
   <link rel="icon" sizes="any" href="{{ getAssetPath("node_modules/govuk-frontend/dist/govuk/assets/images/favicon.svg") }}" type="image/svg+xml" >
   <link rel="mask-icon" href="{{ getAssetPath("node_modules/govuk-frontend/dist/govuk/assets/images/govuk-icon-mask.svg") }}" color="{{ themeColor }}">
   <link rel="apple-touch-icon" href="{{ getAssetPath("node_modules/govuk-frontend/dist/govuk/assets/images/govuk-icon-180.png") }}">
-  <link rel="manifest" href="{{ getAssetPath("node_modules/govuk-frontend/dist/govuk/assets/manifest.json") }}">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="{{ serviceName }}">
+  <meta name="theme-color" content="#1d70b8">
 {% endblock %}
 
 {% block head %}

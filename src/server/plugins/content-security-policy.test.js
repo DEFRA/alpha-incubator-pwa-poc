@@ -20,4 +20,15 @@ describe('#contentSecurityPolicy', () => {
 
     expect(resp.headers['content-security-policy']).toBeDefined()
   })
+
+  test('Should permit worker-src so the service worker can register', async () => {
+    const resp = await server.inject({
+      method: 'GET',
+      url: '/'
+    })
+
+    expect(resp.headers['content-security-policy']).toContain(
+      "worker-src 'self'"
+    )
+  })
 })

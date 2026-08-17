@@ -4,6 +4,7 @@ import { home } from '../routes/home/index.js'
 import { about } from '../routes/about/index.js'
 import { health } from '../routes/health/index.js'
 import { manifest } from '../routes/manifest/index.js'
+import { sw } from '../routes/sw/index.js'
 import { serveStaticFiles } from './serve-static-files.js'
 import { config } from '#/config/config.js'
 
@@ -33,7 +34,7 @@ export const router = {
       await server.register([health])
 
       // Application specific routes, add your own routes here
-      await server.register([home, about, manifest])
+      await server.register([home, about, manifest, sw])
 
       // Static assets
       if (!config.get('isProduction') && !config.get('isTest')) {

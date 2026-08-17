@@ -1,6 +1,7 @@
 describe('sw.js', () => {
   let listeners
   let mockSelf
+  const defaultNotificationUrl = '/notification-page'
 
   const loadServiceWorker = async () => {
     vi.resetModules()
@@ -35,7 +36,7 @@ describe('sw.js', () => {
 
       expect(mockSelf.registration.showNotification).toHaveBeenCalledWith(
         'test notification',
-        { body: '', data: { url: '/notification-page' } }
+        { body: '', data: { url: defaultNotificationUrl } }
       )
       expect(waitUntil).toHaveBeenCalled()
     })
@@ -81,7 +82,7 @@ describe('sw.js', () => {
 
       expect(notification.close).toHaveBeenCalled()
       expect(mockSelf.clients.openWindow).toHaveBeenCalledWith(
-        '/notification-page'
+        defaultNotificationUrl
       )
     })
 
@@ -92,7 +93,7 @@ describe('sw.js', () => {
       ])
       const notification = {
         close: vi.fn(),
-        data: { url: '/notification-page' }
+        data: { url: defaultNotificationUrl }
       }
       const waitUntil = vi.fn()
 
@@ -100,7 +101,7 @@ describe('sw.js', () => {
       await waitUntil.mock.calls[0][0]
 
       expect(mockSelf.clients.openWindow).toHaveBeenCalledWith(
-        '/notification-page'
+        defaultNotificationUrl
       )
     })
 
@@ -113,7 +114,7 @@ describe('sw.js', () => {
       mockSelf.clients.matchAll.mockResolvedValue([existingClient])
       const notification = {
         close: vi.fn(),
-        data: { url: '/notification-page' }
+        data: { url: defaultNotificationUrl }
       }
       const waitUntil = vi.fn()
 

@@ -9,10 +9,8 @@ import {
 
 import { registerServiceWorker } from './register-service-worker.js'
 
-createAll(Button)
-createAll(Checkboxes)
-createAll(ErrorSummary)
-createAll(Radios)
-createAll(SkipLink)
+for (const component of [Button, Checkboxes, ErrorSummary, Radios, SkipLink]) {
+  createAll(component)
+}
 
 registerServiceWorker()

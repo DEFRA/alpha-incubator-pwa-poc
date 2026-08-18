@@ -1,8 +1,7 @@
 describe('#urlBase64ToUint8Array', () => {
   test('Should convert a base64url string into a Uint8Array', async () => {
-    const { urlBase64ToUint8Array } = await import(
-      './register-for-notifications.js'
-    )
+    const { urlBase64ToUint8Array } =
+      await import('./register-for-notifications.js')
 
     const result = urlBase64ToUint8Array('AAEC')
 

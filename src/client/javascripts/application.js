@@ -7,8 +7,10 @@ import {
   SkipLink
 } from 'govuk-frontend'
 
-createAll(Button)
-createAll(Checkboxes)
-createAll(ErrorSummary)
-createAll(Radios)
-createAll(SkipLink)
+import { registerServiceWorker } from './register-service-worker.js'
+
+for (const component of [Button, Checkboxes, ErrorSummary, Radios, SkipLink]) {
+  createAll(component)
+}
+
+registerServiceWorker()

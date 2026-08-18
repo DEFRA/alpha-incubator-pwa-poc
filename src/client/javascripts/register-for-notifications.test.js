@@ -1,3 +1,16 @@
+describe('#urlBase64ToUint8Array', () => {
+  test('Should convert a base64url string into a Uint8Array', async () => {
+    const { urlBase64ToUint8Array } = await import(
+      './register-for-notifications.js'
+    )
+
+    const result = urlBase64ToUint8Array('AAEC')
+
+    expect(result).toBeInstanceOf(Uint8Array)
+    expect(Array.from(result)).toEqual([0, 1, 2])
+  })
+})
+
 describe('#registerForNotifications', () => {
   const loadRegisterForNotifications = async () =>
     (await import('./register-for-notifications.js')).registerForNotifications
@@ -47,7 +60,7 @@ describe('#registerForNotifications', () => {
         ready: Promise.resolve({ pushManager: { subscribe } })
       }
     }
-    const applicationServerKey = 'test-vapid-public-key'
+    const applicationServerKey = 'BEl62iUYgUivxIkv69yViEuiBIa'
 
     await registerForNotifications({
       notification,
@@ -58,7 +71,7 @@ describe('#registerForNotifications', () => {
 
     expect(subscribe).toHaveBeenCalledWith({
       userVisibleOnly: true,
-      applicationServerKey
+      applicationServerKey: expect.any(Uint8Array)
     })
     expect(fetchFn).toHaveBeenCalledWith('/api/push/subscribe', {
       method: 'POST',

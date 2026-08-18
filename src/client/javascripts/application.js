@@ -21,5 +21,7 @@ document
   ?.addEventListener('click', (event) => {
     registerForNotifications({
       applicationServerKey: event.currentTarget.dataset.vapidPublicKey
+    }).catch((err) => {
+      console.error('Failed to register for notifications', err)
     })
   })

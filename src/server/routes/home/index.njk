@@ -1,5 +1,7 @@
 {% extends 'layouts/page.njk' %}
 
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
 {% block content %}
   {{ appHeading({
     text: heading,
@@ -11,6 +13,13 @@
       <div class="govuk-body" data-testid="app-page-body">
         <p></p>
       </div>
+      {{ govukButton({
+        text: "Register for notifications",
+        attributes: {
+          id: "register-notifications",
+          "data-vapid-public-key": vapidPublicKey
+        }
+      }) }}
     </div>
   </div>
 

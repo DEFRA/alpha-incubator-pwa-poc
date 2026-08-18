@@ -26,6 +26,68 @@ This means the whole POC can be built with the standard `web-push` npm library (
 rather than any vendor-specific push SDK — see
 `adr/using-standard-web-push-protocol.adr.md`.
 
+## System flow
+
+The diagram below walks through the whole install → register → notify → click-through
+journey and which file is responsible for each step.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Safari
+    participant SW as Service worker<br/>(src/client/sw.js)
+    participant Server as Hapi server
+    participant PushSvc as push-service.js<br/>(web-push/VAPID)
+    participant APNs as Apple Push Service
+
+    Note over User,Safari: Stage 01 — Installability
+    User->>Safari: Visit site, "Add to Home Screen"
+    Safari->>Server: GET /manifest.webmanifest
+    Server-->>Safari: name, icons, display: standalone
+
+    Note over User,SW: Stage 02 — Service worker
+    Safari->>Server: GET /sw.js
+    Server-->>Safari: service worker script
+    Safari->>SW: register() + activate (scope: /)
+
+    Note over User,Server: Stage 03 — Subscription flow
+    User->>Safari: Click "Register for notifications"
+    Safari->>Safari: Notification.requestPermission()
+    Safari->>SW: navigator.serviceWorker.ready
+    SW-->>Safari: pushManager.subscribe(VAPID public key)
+    Safari->>Server: POST /api/push/subscribe<br/>{endpoint, keys}
+    Server->>Server: validate + store subscription<br/>(subscription-store.js, in-memory)
+    Server-->>Safari: 202 Accepted
+    Server->>Server: setTimeout 30s (controller.js)
+
+    Note over Server,APNs: Stage 04 — Sending notifications
+    Server->>PushSvc: sendTestNotification(subscription)
+    PushSvc->>APNs: webPush.sendNotification(subscription, payload)
+    APNs->>SW: push event delivered
+    SW->>Safari: showNotification("test notification")
+
+    Note over User,Server: Stage 05 — Notification page
+    User->>Safari: Tap notification
+    Safari->>SW: notificationclick event
+    SW->>Safari: clients.openWindow/focus(/notification-page)
+    Safari->>Server: GET /notification-page
+    Server-->>Safari: confirmation page
+```
+
+Key points to keep in mind while reading the code:
+
+- Everything left of "Stage 04" happens in the **browser tab**; `sw.js` runs in a
+  separate **service worker context** that outlives the tab (that's what lets it receive
+  a push and show a notification even if the site isn't open).
+- The 30-second delay is a plain `setTimeout` in
+  `src/server/routes/push/controller.js` — there's no queue/scheduler (see
+  `adr/storing-push-subscriptions-in-memory.adr.md`).
+- `push-service.js` never talks to the browser directly — it hands the payload to the
+  `web-push` library, which encrypts it and posts it to the browser vendor's push
+  service (Apple's, in Safari's case); that service is what actually wakes the device.
+- The server only ever holds one subscription at a time ("last registered wins") — this
+  is a single-tester POC, not a multi-user system.
+
 ## Constraints confirmed for this POC
 
 - **Local dev:** desktop macOS Safari against `localhost` — service workers treat

@@ -4,6 +4,9 @@ import { sendTestNotification } from '#/server/common/helpers/push/push-service.
 
 const notificationDelayMs = 30_000
 
+const isNonEmptyString = (value) =>
+  typeof value === 'string' && value.length > 0
+
 /**
  * Validates the shape of an incoming PushSubscription payload
  * (endpoint + keys.p256dh + keys.auth), per the Push API spec.
@@ -11,13 +14,10 @@ const notificationDelayMs = 30_000
 function isValidSubscription(payload) {
   return Boolean(
     payload &&
-    typeof payload.endpoint === 'string' &&
-    payload.endpoint.length > 0 &&
+    isNonEmptyString(payload.endpoint) &&
     payload.keys &&
-    typeof payload.keys.p256dh === 'string' &&
-    payload.keys.p256dh.length > 0 &&
-    typeof payload.keys.auth === 'string' &&
-    payload.keys.auth.length > 0
+    isNonEmptyString(payload.keys.p256dh) &&
+    isNonEmptyString(payload.keys.auth)
   )
 }
 

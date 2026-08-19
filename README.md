@@ -6,6 +6,73 @@
 
 Core delivery platform Node.js Frontend Template.
 
+## Progress update
+
+This repository is a **proof of concept**, not a production service. It exists to
+prototype turning a GOV.UK-styled Hapi.js web app into an installable Progressive Web
+App (PWA) that sends native push notifications to a user's device via Safari (macOS and
+iOS/iPadOS), using nothing but the standard W3C Web Push stack (Web App Manifest,
+Service Worker, Push API, Notifications API) — no vendor SDK, no Apple Developer
+account. See [`AGENTS.md`](./AGENTS.md) for full context and
+[`docs/plan/`](./docs/plan/00-overview.md) for the staged build plan this POC followed.
+
+### What it demonstrates end-to-end
+
+1. A user visits the site in Safari and installs it to their Home Screen/Dock as a PWA.
+2. They click **"Register for notifications"**, which requests notification permission
+   and subscribes the browser to push via VAPID.
+3. ~10 seconds later, the device shows a native push notification ("test notification").
+4. Tapping the notification opens the installed app at **`/notification-page`**.
+
+### Status
+
+All core stages of the build plan are complete, tested, and merged:
+
+- [`01-installability.md`](./docs/plan/01-installability.md) — Web App Manifest, icons, meta tags
+- [`02-service-worker.md`](./docs/plan/02-service-worker.md) — root-scoped service worker
+- [`03-subscription-flow.md`](./docs/plan/03-subscription-flow.md) — "Register for notifications" button and subscribe flow
+- [`04-sending-notifications.md`](./docs/plan/04-sending-notifications.md) — `web-push`/VAPID, scheduled send of the test notification
+- [`05-notification-page.md`](./docs/plan/05-notification-page.md) — `/notification-page` click target
+- [`06-testing-and-docs.md`](./docs/plan/06-testing-and-docs.md) — unit tests, manual test scripts, docs
+
+The optional stretch goal, [`07-stretch-geolocation.md`](./docs/plan/07-stretch-geolocation.md)
+(gating the notification send on the user's location), was **not** picked up.
+
+### Problems encountered along the way
+
+- **VAPID public key format** — `pushManager.subscribe()` requires the VAPID public key
+  as a `Uint8Array`, not the base64url string returned by `web-push`'s key generator;
+  this needed an explicit conversion step on the client.
+- **Service worker updates not taking effect** — an installed PWA is usually
+  backgrounded rather than fully closed, so the browser's default "wait for all tabs to
+  close" update behaviour meant a new service worker never took control. Fixed by calling
+  `skipWaiting()`/`clients.claim()` on install/activate.
+- **Notification click didn't navigate existing windows** — `clients.matchAll()` +
+  `existing.focus()` only refocuses an already-open window at its current URL; it doesn't
+  navigate it to the notification's target. Needed an explicit `existing.navigate(url)`
+  alongside `focus()`, using an absolute (not relative) URL.
+- **iOS/iPadOS testing requires HTTPS** — `localhost` is fine for macOS Safari during
+  local development, but device testing on iOS/iPadOS needed a real HTTPS deployment
+  (the CDP `dev` environment), since Safari doesn't treat a phone's connection to a
+  laptop's `localhost` as a secure context.
+- **Single-instance, in-memory subscription storage** — a deliberate POC-scoped decision
+  (see [`adr/storing-push-subscriptions-in-memory.adr.md`](./adr/storing-push-subscriptions-in-memory.adr.md));
+  subscriptions are lost on every restart and only one "last registered wins" subscriber
+  is supported.
+- **Local dev environment fragility** — this repo's `node_modules` can end up in a
+  broken state (missing native `rolldown`/Vite bindings) depending on how/when
+  `npm install` last ran on Apple Silicon; a clean reinstall
+  (`rm -rf node_modules package-lock.json && npm install`) resolves it, but it's a
+  recurring local-only nuisance unrelated to the application code.
+
+See the [`adr/`](./adr) directory for the full rationale behind the key technical
+decisions made in this POC:
+
+- [`using-standard-web-push-protocol.adr.md`](./adr/using-standard-web-push-protocol.adr.md)
+- [`managing-vapid-keys-via-environment-variables.adr.md`](./adr/managing-vapid-keys-via-environment-variables.adr.md)
+- [`storing-push-subscriptions-in-memory.adr.md`](./adr/storing-push-subscriptions-in-memory.adr.md)
+
+- [Progress update](#progress-update)
 - [Requirements](#requirements)
   - [Node.js](#nodejs)
 - [Server-side Caching](#server-side-caching)

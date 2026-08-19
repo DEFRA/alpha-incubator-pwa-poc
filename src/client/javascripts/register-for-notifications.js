@@ -27,12 +27,18 @@ export async function registerForNotifications({
   fetchFn = fetch
 } = {}) {
   if (!notification) {
-    return
+    return 'unsupported'
   }
 
   const permission = await notification.requestPermission()
   if (permission !== 'granted') {
-    return
+    return 'denied'
+  }
+
+  if (!applicationServerKey) {
+    throw new Error(
+      'VAPID public key is missing — check the VAPID_PUBLIC_KEY environment variable is set on the server.'
+    )
   }
 
   const registration = await nav.serviceWorker.ready
@@ -46,4 +52,6 @@ export async function registerForNotifications({
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(subscription)
   })
+
+  return 'subscribed'
 }

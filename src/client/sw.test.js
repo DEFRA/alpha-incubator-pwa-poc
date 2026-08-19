@@ -10,12 +10,17 @@ describe('sw.js', () => {
       addEventListener: vi.fn((type, handler) => {
         listeners[type] = handler
       }),
+      skipWaiting: vi.fn(),
+      location: {
+        origin: 'https://example.com'
+      },
       registration: {
         showNotification: vi.fn()
       },
       clients: {
         matchAll: vi.fn(),
-        openWindow: vi.fn()
+        openWindow: vi.fn(),
+        claim: vi.fn()
       }
     }
     globalThis.self = mockSelf
@@ -25,6 +30,27 @@ describe('sw.js', () => {
 
   afterEach(() => {
     delete globalThis.self
+  })
+
+  describe('lifecycle events', () => {
+    test('Should activate a new service worker immediately instead of waiting', async () => {
+      await loadServiceWorker()
+      const waitUntil = vi.fn()
+
+      await listeners.install({ waitUntil })
+
+      expect(mockSelf.skipWaiting).toHaveBeenCalled()
+    })
+
+    test('Should take control of already-open clients on activate', async () => {
+      await loadServiceWorker()
+      const waitUntil = vi.fn()
+
+      await listeners.activate({ waitUntil })
+
+      expect(mockSelf.clients.claim).toHaveBeenCalled()
+      expect(waitUntil).toHaveBeenCalled()
+    })
   })
 
   describe('push event', () => {
@@ -82,7 +108,7 @@ describe('sw.js', () => {
 
       expect(notification.close).toHaveBeenCalled()
       expect(mockSelf.clients.openWindow).toHaveBeenCalledWith(
-        defaultNotificationUrl
+        'https://example.com/notification-page'
       )
     })
 
@@ -101,15 +127,16 @@ describe('sw.js', () => {
       await waitUntil.mock.calls[0][0]
 
       expect(mockSelf.clients.openWindow).toHaveBeenCalledWith(
-        defaultNotificationUrl
+        'https://example.com/notification-page'
       )
     })
 
-    test('Should focus an existing client whose url already matches the target url', async () => {
+    test('Should navigate and focus an existing client whose url already matches the target url', async () => {
       await loadServiceWorker()
       const existingClient = {
         url: 'https://example.com/notification-page',
-        focus: vi.fn()
+        focus: vi.fn(),
+        navigate: vi.fn()
       }
       mockSelf.clients.matchAll.mockResolvedValue([existingClient])
       const notification = {
@@ -121,6 +148,9 @@ describe('sw.js', () => {
       await listeners.notificationclick(buildEvent(notification, waitUntil))
       await waitUntil.mock.calls[0][0]
 
+      expect(existingClient.navigate).toHaveBeenCalledWith(
+        'https://example.com/notification-page'
+      )
       expect(existingClient.focus).toHaveBeenCalled()
       expect(mockSelf.clients.openWindow).not.toHaveBeenCalled()
     })

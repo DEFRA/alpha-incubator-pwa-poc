@@ -79,12 +79,12 @@ describe('#pushSubscribeController', () => {
     expect(getSubscription()).toEqual(validSubscription)
   })
 
-  test('Should schedule sendTestNotification with the subscription ~30 seconds after a valid subscribe', async () => {
+  test('Should schedule sendTestNotification with the subscription ~10 seconds after a valid subscribe', async () => {
     await postSubscribe(validSubscription)
 
     expect(sendTestNotification).not.toHaveBeenCalled()
 
-    await vi.advanceTimersByTimeAsync(30_000)
+    await vi.advanceTimersByTimeAsync(10_000)
 
     expect(sendTestNotification).toHaveBeenCalledWith(validSubscription)
   })
@@ -95,7 +95,7 @@ describe('#pushSubscribeController', () => {
     const { request } = await postSubscribe(validSubscription)
     const errorSpy = vi.spyOn(request.logger, 'error')
 
-    await expect(vi.advanceTimersByTimeAsync(30_000)).resolves.not.toThrow()
+    await expect(vi.advanceTimersByTimeAsync(10_000)).resolves.not.toThrow()
     expect(errorSpy).toHaveBeenCalledWith(expect.any(Error))
   })
 })

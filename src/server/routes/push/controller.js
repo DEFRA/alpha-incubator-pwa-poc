@@ -2,7 +2,7 @@ import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { saveSubscription } from '#/server/common/helpers/push/subscription-store.js'
 import { sendTestNotification } from '#/server/common/helpers/push/push-service.js'
 
-const notificationDelayMs = 30_000
+const notificationDelayMs = 10_000
 
 const isNonEmptyString = (value) =>
   typeof value === 'string' && value.length > 0

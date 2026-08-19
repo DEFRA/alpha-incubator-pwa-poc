@@ -24,7 +24,7 @@ describe('#registerForNotifications', () => {
 
     await expect(
       registerForNotifications({ notification: undefined, fetchFn })
-    ).resolves.not.toThrow()
+    ).resolves.toBe('unsupported')
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
@@ -40,6 +40,46 @@ describe('#registerForNotifications', () => {
     }
 
     await registerForNotifications({ notification, nav, fetchFn })
+
+    expect(subscribe).not.toHaveBeenCalled()
+    expect(fetchFn).not.toHaveBeenCalled()
+  })
+
+  test('Should report denied so the caller can tell the user permission was refused', async () => {
+    const registerForNotifications = await loadRegisterForNotifications()
+    const notification = { requestPermission: vi.fn(() => 'denied') }
+    const nav = {
+      serviceWorker: { ready: Promise.resolve({ pushManager: {} }) }
+    }
+
+    const result = await registerForNotifications({
+      notification,
+      nav,
+      fetchFn: vi.fn()
+    })
+
+    expect(result).toBe('denied')
+  })
+
+  test('Should throw a clear error and not subscribe when applicationServerKey is missing', async () => {
+    const registerForNotifications = await loadRegisterForNotifications()
+    const fetchFn = vi.fn()
+    const subscribe = vi.fn()
+    const notification = { requestPermission: vi.fn(() => 'granted') }
+    const nav = {
+      serviceWorker: {
+        ready: Promise.resolve({ pushManager: { subscribe } })
+      }
+    }
+
+    await expect(
+      registerForNotifications({
+        notification,
+        nav,
+        fetchFn,
+        applicationServerKey: ''
+      })
+    ).rejects.toThrow(/VAPID public key is missing/i)
 
     expect(subscribe).not.toHaveBeenCalled()
     expect(fetchFn).not.toHaveBeenCalled()
@@ -77,5 +117,29 @@ describe('#registerForNotifications', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(subscription)
     })
+  })
+
+  test('Should report subscribed so the caller can confirm success to the user', async () => {
+    const registerForNotifications = await loadRegisterForNotifications()
+    const subscription = {
+      endpoint: 'https://push.example.com/subscription/123',
+      keys: { p256dh: 'p256dh-key', auth: 'auth-key' }
+    }
+    const nav = {
+      serviceWorker: {
+        ready: Promise.resolve({
+          pushManager: { subscribe: vi.fn(() => Promise.resolve(subscription)) }
+        })
+      }
+    }
+
+    const result = await registerForNotifications({
+      notification: { requestPermission: vi.fn(() => 'granted') },
+      nav,
+      fetchFn: vi.fn(() => Promise.resolve({ ok: true })),
+      applicationServerKey: 'BEl62iUYgUivxIkv69yViEuiBIa'
+    })
+
+    expect(result).toBe('subscribed')
   })
 })

@@ -2,6 +2,7 @@ import inert from '@hapi/inert'
 
 import { home } from '../routes/home/index.js'
 import { about } from '../routes/about/index.js'
+import { notificationPage } from '../routes/notification-page/index.js'
 import { health } from '../routes/health/index.js'
 import { manifest } from '../routes/manifest/index.js'
 import { sw } from '../routes/sw/index.js'
@@ -35,7 +36,7 @@ export const router = {
       await server.register([health])
 
       // Application specific routes, add your own routes here
-      await server.register([home, about, manifest, sw, push])
+      await server.register([home, about, notificationPage, manifest, sw, push])
 
       // Static assets
       if (!config.get('isProduction') && !config.get('isTest')) {

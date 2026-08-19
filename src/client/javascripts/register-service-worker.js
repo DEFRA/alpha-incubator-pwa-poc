@@ -4,6 +4,8 @@
  */
 export const registerServiceWorker = (nav = navigator) => {
   if ('serviceWorker' in nav) {
-    nav.serviceWorker.register('/sw.js')
+    nav.serviceWorker
+      .register('/sw.js')
+      .catch((err) => console.error('Service worker registration failed', err))
   }
 }

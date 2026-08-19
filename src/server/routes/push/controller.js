@@ -1,5 +1,11 @@
 import { statusCodes } from '#/server/common/constants/status-codes.js'
 import { saveSubscription } from '#/server/common/helpers/push/subscription-store.js'
+import { sendTestNotification } from '#/server/common/helpers/push/push-service.js'
+
+const notificationDelayMs = 10_000
+
+const isNonEmptyString = (value) =>
+  typeof value === 'string' && value.length > 0
 
 /**
  * Validates the shape of an incoming PushSubscription payload
@@ -8,13 +14,10 @@ import { saveSubscription } from '#/server/common/helpers/push/subscription-stor
 function isValidSubscription(payload) {
   return Boolean(
     payload &&
-    typeof payload.endpoint === 'string' &&
-    payload.endpoint.length > 0 &&
+    isNonEmptyString(payload.endpoint) &&
     payload.keys &&
-    typeof payload.keys.p256dh === 'string' &&
-    payload.keys.p256dh.length > 0 &&
-    typeof payload.keys.auth === 'string' &&
-    payload.keys.auth.length > 0
+    isNonEmptyString(payload.keys.p256dh) &&
+    isNonEmptyString(payload.keys.auth)
   )
 }
 
@@ -27,6 +30,12 @@ export const pushSubscribeController = {
     }
 
     saveSubscription(subscription)
+
+    setTimeout(() => {
+      sendTestNotification(subscription).catch((err) =>
+        request.logger.error(err)
+      )
+    }, notificationDelayMs)
 
     return h.response().code(statusCodes.accepted)
   }
